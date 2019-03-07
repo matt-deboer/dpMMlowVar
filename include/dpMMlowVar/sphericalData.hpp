@@ -325,7 +325,7 @@ void Spherical<T>::computeCenters(const
 };
 
   template<typename T>                                                            
-Matrix<T,Eigen::Dynamic,1> Spherical<T>::computeSum(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
+Eigen::Matrix<T,Eigen::Dynamic,1> Spherical<T>::computeSum(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
     const VectorXu& z, const uint32_t k, uint32_t* N_k)
 {
   const uint32_t D = x.rows();

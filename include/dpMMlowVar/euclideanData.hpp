@@ -270,7 +270,7 @@ void Euclidean<T>::computeCenters(const
 };
 
   template<typename T>                                                            
-Matrix<T,Eigen::Dynamic,1> Euclidean<T>::computeSum(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
+Eigen::Matrix<T,Eigen::Dynamic,1> Euclidean<T>::computeSum(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
     const VectorXu& z, const uint32_t k, uint32_t* N_k)
 {
   const uint32_t D = x.rows();
@@ -288,7 +288,7 @@ Matrix<T,Eigen::Dynamic,1> Euclidean<T>::computeSum(const Eigen::Matrix<T,Eigen:
 };
 
 template<typename T>                                                            
-Matrix<T,Eigen::Dynamic,Eigen::Dynamic> Euclidean<T>::computeCenters(const
+Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> Euclidean<T>::computeCenters(const
     Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, const VectorXu& z, const uint32_t K, 
     VectorXu& Ns)
 {
@@ -301,7 +301,7 @@ Matrix<T,Eigen::Dynamic,Eigen::Dynamic> Euclidean<T>::computeCenters(const
 };
 
 template<typename T>                                                            
-Matrix<T,Eigen::Dynamic,1> Euclidean<T>::computeCenter(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
+Eigen::Matrix<T,Eigen::Dynamic,1> Euclidean<T>::computeCenter(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
     const VectorXu& z, const uint32_t k, uint32_t* N_k)
 {
   const uint32_t D = x.rows();
@@ -329,7 +329,7 @@ Matrix<T,Eigen::Dynamic,1> Euclidean<T>::computeCenter(const Eigen::Matrix<T,Eig
 };
 
 template<typename T>                                                            
-Matrix<T,Eigen::Dynamic,1> Euclidean<T>::reInstantiatedOldCluster(const
+Eigen::Matrix<T,Eigen::Dynamic,1> Euclidean<T>::reInstantiatedOldCluster(const
     Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, const T N_k, const Eigen::Matrix<T,Eigen::Dynamic,1>& ps_k, const T t_k, const
     T w_k, const T tau)
 {
