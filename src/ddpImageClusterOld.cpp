@@ -266,7 +266,7 @@ void printProgress(std::string pre, double pct){
 	return;
 }
 
-shared_ptr<MXf> extractVectorDatacv::Mat& frame){
+boost::shared_ptr<MXf> extractVectorDatacv::Mat& frame){
 cv::Mat framef, frameLab;
 	frame.convertTo(framef, CV_32F, 1.0/255.0);
 	cvtColor(framef, frameLab, CV_RGB2Lab);

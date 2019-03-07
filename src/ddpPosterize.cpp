@@ -41,7 +41,7 @@ namespace po = boost::program_options;
 int makeDirectory(const char* name);
 //vector<VSModel::Data> extractVSModelData(Mat& frame);
 void printProgress(string pre, double pct);
-shared_ptr<MXf> extractVectorData(Mat& frame);
+boost::shared_ptr<MXf> extractVectorData(Mat& frame);
 //Mat createOutputFrame(Mat& frame, dmeans::Results<VSModel>& res);
 cv::Mat posterize(int rw, int cl, VXu z, MXf p);
 
@@ -248,7 +248,7 @@ int makeDirectory(const char* name){
 //	return data;
 //}
 
-shared_ptr<MXf> extractVectorData(Mat& frame){
+boost::shared_ptr<MXf> extractVectorData(Mat& frame){
 	Mat framef, frameLab;
 	frame.convertTo(framef, CV_32F, 1.0/255.0);
 	cvtColor(framef, frameLab, CV_RGB2Lab);

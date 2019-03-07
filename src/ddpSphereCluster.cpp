@@ -27,7 +27,7 @@ using namespace dplv;
 namespace po = boost::program_options;
 
 int makeDirectory(const char* name);
-shared_ptr<MXf> extractVectorData(cv::Mat& frame);
+boost::shared_ptr<MXf> extractVectorData(cv::Mat& frame);
 cv::Mat compress(int rw, int cl, VXu z, MXf p);
 
 void printProgress(std::string pre, double pct);
@@ -152,7 +152,7 @@ void printProgress(std::string pre, double pct){
 	return;
 }
 
-shared_ptr<MXf> extractVectorData(cv::Mat& frame){
+boost::shared_ptr<MXf> extractVectorData(cv::Mat& frame){
 	MXf* data = new MXf(3, frame.rows*frame.cols);
 	int idx = 0;
 	for(int y = 0; y < frame.rows; y++){
