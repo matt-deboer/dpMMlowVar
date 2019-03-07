@@ -282,7 +282,7 @@ cv::Mat framef, frameLab;
 		}
 	}
 	//cout << "RGB: " << frame.at<Vec3b>(0, 0) << " Lab: " << frameLab.at<Vec3f>(0, 0) << " data: " << data[0].v.transpose() << endl;
-	return shared_ptr<MXf>(data);
+	return boost::shared_ptr<MXf>(data);
 }
 
 
@@ -352,8 +352,8 @@ int main(int argc, char** argv){
 	cout << "New Frame Dimensions: " << nfr_w << " x " << nfr_h << endl;
 
 	//set up the DDP Means object
-	shared_ptr<MXf> tmp(new MXf(3, 1));
-    	shared_ptr<ClDataGpuf> cld(new ClDataGpuf(tmp,0));
+	boost::shared_ptr<MXf> tmp(new MXf(3, 1));
+    	boost::shared_ptr<ClDataGpuf> cld(new ClDataGpuf(tmp,0));
     	DDPMeansCUDA<float,Euclidean<float> > *clusterer = new
     	DDPMeansCUDA<float,Euclidean<float> >(cld, lambda, Q, tau);
 
@@ -373,7 +373,7 @@ int main(int argc, char** argv){
 			resize(frame, frameresized, Size(nfr_w, nfr_h), 0, 0, INTER_CUBIC);
 			frameresized.copyTo(frame);
 		}
-		shared_ptr<MXf> data = extractVectorData(frame);
+		boost::shared_ptr<MXf> data = extractVectorData(frame);
 		clusterer->nextTimeStep(data);
 		do{
 			clusterer->updateLabels();

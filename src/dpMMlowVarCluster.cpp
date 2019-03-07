@@ -88,7 +88,7 @@ int main(int argc, char **argv)
   }
   cout << "alpha="<<alpha.transpose()<<endl;
 
-  shared_ptr<Eigen::MatrixXd> spx(new Eigen::MatrixXd(D,N));
+  boost::shared_ptr<Eigen::MatrixXd> spx(new Eigen::MatrixXd(D,N));
   Eigen::MatrixXd& x(*spx);
   std::string pathIn ="";
   if(vm.count("input")) pathIn = vm["input"].as<std::string>();

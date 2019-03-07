@@ -66,14 +66,14 @@ int main(int argc, char** argv){
 	double Q = T_Q == 0.? -2. : lambda/T_Q;
 	
 	//set up the DDP Means object
-//	shared_ptr<MXf> tmp(new MXf(3, 1));
-//  shared_ptr<jsc::ClDataGpuf> cld(new jsc::ClDataGpuf(tmp,0));
+//	boost::shared_ptr<MXf> tmp(new MXf(3, 1));
+//  boost::shared_ptr<jsc::ClDataGpuf> cld(new jsc::ClDataGpuf(tmp,0));
 ////  DDPMeansCUDA<float,Spherical<float> > *clusterer = new
 //  Clusterer<float,Spherical<float> > *clusterer = new
 //    DDPMeansCUDA<float,Spherical<float> >(cld, lambda, Q, beta);
    
-	shared_ptr<MXf> tmp(new MXf(3, 1));
-  shared_ptr<jsc::ClDataGpuf> cld(new jsc::ClDataGpuf(tmp,6));
+	boost::shared_ptr<MXf> tmp(new MXf(3, 1));
+  boost::shared_ptr<jsc::ClDataGpuf> cld(new jsc::ClDataGpuf(tmp,6));
   Clusterer<float,Spherical<float> > *clusterer = new
     KMeans<float,Spherical<float> >(cld);
 
@@ -85,7 +85,7 @@ int main(int argc, char** argv){
 		cv::Mat frame = imreadBinary(inputPath+std::string(fileName));
 		if(frame.rows == 0 || frame.cols == 0) break;
 
-		shared_ptr<MXf> data = extractVectorData(frame);
+		boost::shared_ptr<MXf> data = extractVectorData(frame);
     std::cout<<"spherical data size: "<<data->rows()<<"x"<<data->cols()<<std::endl; 
 		clusterer->nextTimeStep(data);
 		do{
@@ -166,6 +166,6 @@ shared_ptr<MXf> extractVectorData(cv::Mat& frame){
     }
 	}
 	//cout << "RGB: " << frame.at<Vec3b>(0, 0) << " Lab: " << frameLab.at<cv::Vec3f>(0, 0) << " data: " << data[0].v.transpose() << endl;
-	return shared_ptr<MXf>(data);
+	return boost::shared_ptr<MXf>(data);
 }
 

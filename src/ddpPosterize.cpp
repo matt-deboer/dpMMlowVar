@@ -132,8 +132,8 @@ int main(int argc, char** argv){
 //	dmeans::DMeans<VSModel, dmeans::Iterative> dynm(dynm_cfg);
 
   //set up the DDP Means object
-	shared_ptr<MXf> tmp(new MXf(3, 1));
-  shared_ptr<ClDataGpuf> cld(new ClDataGpuf(tmp,0));
+	boost::shared_ptr<MXf> tmp(new MXf(3, 1));
+  boost::shared_ptr<ClDataGpuf> cld(new ClDataGpuf(tmp,0));
   DDPMeansCUDA<float,Euclidean<float> > *clusterer = new
     DDPMeansCUDA<float,Euclidean<float> >(cld, lambda, Q, tau);
 
@@ -148,7 +148,7 @@ int main(int argc, char** argv){
 		bool empty = !cap.retrieve(frame);
 		if(empty) break;
     if(fr < 600) {++ fr; continue;}
-    shared_ptr<MXf> data;
+    boost::shared_ptr<MXf> data;
 		if (nfr_w != fr_w || nfr_h != fr_h){
 			Mat frameresized;
 			resize(frame, frameresized, Size(nfr_w, nfr_h), 0, 0, INTER_CUBIC);
@@ -264,7 +264,7 @@ shared_ptr<MXf> extractVectorData(Mat& frame){
 		}
 	}
 	//cout << "RGB: " << frame.at<Vec3b>(0, 0) << " Lab: " << frameLab.at<Vec3f>(0, 0) << " data: " << data[0].v.transpose() << endl;
-	return shared_ptr<MXf>(data);
+	return boost::shared_ptr<MXf>(data);
 }
 
 //JULIAN: Here is where you take the dmeans results and draw superpixel boundaries
