@@ -10,7 +10,6 @@
 
 #include <dpMMlowVar/kmeans.hpp>
 
-using namespace Eigen;
 using std::cout;
 using std::endl;
 
@@ -20,12 +19,12 @@ template<class T, class DS>
 class DPMeans : public KMeans<T,DS>
 {
 public:
-  DPMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K0,
+  DPMeans(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx, uint32_t K0,
     double lambda);
   DPMeans(const boost::shared_ptr<jsc::ClData<T> >& cld, double lambda);
   virtual ~DPMeans();
 
-//  void initialize(const Matrix<T,Dynamic,Dynamic>& x);
+//  void initialize(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x);
   virtual void updateLabels();
   virtual void updateCenters();
 
@@ -37,7 +36,7 @@ protected:
 
 // -------------------------------- impl ----------------------------------
 template<class T, class DS>
-DPMeans<T,DS>::DPMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, 
+DPMeans<T,DS>::DPMeans(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx, 
     uint32_t K0, double lambda)
   : KMeans<T,DS>(spx,K0), lambda_(lambda)
 {}
@@ -117,7 +116,7 @@ void DPMeans<T,DS>::updateCenters()
       kNew --;
     }
 
-//  Matrix<T,Dynamic,Dynamic> psNew(this->D_,kNew);
+//  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> psNew(this->D_,kNew);
 //  int32_t offset = 0;
   for(int32_t k=this->K_; k >=0 ; --k)
     if(toDelete[k])

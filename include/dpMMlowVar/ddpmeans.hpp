@@ -11,7 +11,6 @@
 
 #include <dpMMlowVar/dpmeans.hpp>
 
-using namespace Eigen;
 using std::cout;
 using std::endl;
 
@@ -21,7 +20,7 @@ template<class T, class DS>
 class DDPMeans : public DPMeans<T,DS>
 {
 public:
-  DDPMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx,
+  DDPMeans(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx,
       T lambda, T Q, T tau);
   DDPMeans(const boost::shared_ptr<jsc::ClData<T> >& cld,
       T lambda, T Q, T tau);
@@ -32,7 +31,7 @@ public:
   virtual void updateCenters();
   
   virtual void initRevive();
-  virtual void nextTimeStep(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, bool reviveOnInit=true);
+  virtual void nextTimeStep(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx, bool reviveOnInit=true);
 //  virtual void nextTimeStep(const boost::shared_ptr<jsc::ClData<T> >& cld);
   virtual void updateState(bool verbose=false); // after converging for a single time instant
 
@@ -45,26 +44,26 @@ public:
       && (this->prevNs_.array() == this->counts().array()).all();
   };
 
-  Matrix<T,Dynamic,1> ages(){
-    Matrix<T,Dynamic,1> ts(this->K_);
+  Eigen::Matrix<T,Eigen::Dynamic,1> ages(){
+    Eigen::Matrix<T,Eigen::Dynamic,1> ts(this->K_);
     for(uint32_t k=0; k<this->K_; ++k) ts(k) = this->cls_[k]->t();
     return ts;
   };
 
-  Matrix<T,Dynamic,1> weights(){
-    Matrix<T,Dynamic,1> ws(this->K_);
+  Eigen::Matrix<T,Eigen::Dynamic,1> weights(){
+    Eigen::Matrix<T,Eigen::Dynamic,1> ws(this->K_);
     for(uint32_t k=0; k<this->K_; ++k) ws(k) = this->cls_[k]->w();
     return ws;
   };
 
-  Matrix<T,Dynamic,Dynamic> prevCentroids(){
-    Matrix<T,Dynamic,Dynamic> prevCs(this->D_,this->K_);
+  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> prevCentroids(){
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> prevCs(this->D_,this->K_);
     for(uint32_t k=0; k<this->K_; ++k) 
       prevCs.col(k) = this->cls_[k]->prevCentroid();
     return prevCs;
   };
 
-  virtual void rotateUninstantiated(const Matrix<T,Dynamic,Dynamic>& dR);
+  virtual void rotateUninstantiated(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& dR);
   virtual void dumpStats(std::ofstream& fout);
 
 protected:
@@ -83,7 +82,7 @@ protected:
 
 // -------------------------------- impl ----------------------------------
 template<class T, class DS>
-DDPMeans<T,DS>::DDPMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, 
+DDPMeans<T,DS>::DDPMeans(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx, 
     T lambda, T Q, T tau)
   : DPMeans<T,DS>(spx,0,lambda), cl0_(tau,lambda,Q), globalMaxInd_(0)
 {
@@ -264,7 +263,7 @@ void DDPMeans<T,DS>::updateCenters()
 };
 
 template<class T, class DS>
-void DDPMeans<T,DS>::nextTimeStep(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, bool reviveOnInit)
+void DDPMeans<T,DS>::nextTimeStep(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx, bool reviveOnInit)
 {
 //  this->clsPrev_.clear();
 //#pragma omp parallel for 
@@ -375,7 +374,7 @@ void DDPMeans<T,DS>::dumpStats(std::ofstream& fout)
 };
 
 template<class T, class DS>
-void DDPMeans<T,DS>::rotateUninstantiated(const Matrix<T,Dynamic,Dynamic>& dR)
+void DDPMeans<T,DS>::rotateUninstantiated(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& dR)
 {
   for(int32_t k=0; k<this->K_; ++k)
     if(!this->cls_[k]->isInstantiated())

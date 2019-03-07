@@ -128,7 +128,7 @@ void DDPMeansCUDA<T,DS>::setupComputeLabelsGPU(uint32_t iAction)
   d_ages_.set(this->ages());
   d_ws_.set(this->weights());
 
-  Matrix<T,Dynamic,Dynamic> ps(this->D_,this->K_);
+  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> ps(this->D_,this->K_);
   for(uint32_t k=0; k<this->K_; ++k)
     if(this->cls_[k]->isInstantiated())
       ps.col(k) = this->cls_[k]->centroid();
@@ -235,8 +235,8 @@ VectorXu DDPMeansCUDA<T,DS>::initLabels()
     // d_ws_.set(this->weights());
     
     // cout << "[DDPMeansCUDA::initLabels] k_index_start:" << k_index_start << " k_batch_size" << k_batch_size << endl;
-    Matrix<T,Dynamic,1> ages = this->ages().block(k_index_start,0,k_batch_size,1);
-    Matrix<T,Dynamic,1> weights = this->weights().block(k_index_start,0,k_batch_size,1);
+    Eigen::Matrix<T,Eigen::Dynamic,1> ages = this->ages().block(k_index_start,0,k_batch_size,1);
+    Eigen::Matrix<T,Eigen::Dynamic,1> weights = this->weights().block(k_index_start,0,k_batch_size,1);
     // cout << "[DDPMeansCUDA::initLabels] ages: " << ages.rows() << " by " << ages.cols() << endl;
     // cout << "[DDPMeansCUDA::initLabels] weights: " << weights.rows() << " by " << weights.cols() << endl;
     
@@ -244,8 +244,8 @@ VectorXu DDPMeansCUDA<T,DS>::initLabels()
     d_ws_.set(weights);
 
     // TODO not too too sure about this
-    // Matrix<T,Dynamic,Dynamic> ps(this->D_,this->K_);
-    Matrix<T,Dynamic,Dynamic> ps(this->D_,k_batch_size);
+    // Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> ps(this->D_,this->K_);
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> ps(this->D_,k_batch_size);
     // cout << "[DDPMeansCUDA::initLabels] ps: " << ps.rows() << " by " << ps.cols() << endl;
 
     // for(uint32_t k=0; k<this->K_; ++k)
@@ -302,7 +302,7 @@ VectorXu DDPMeansCUDA<float,Spherical<float> >::initLabels()
   d_ws_.set(this->weights());
 
   // TODO not too too sure about this
-  Matrix<float,Dynamic,Dynamic> ps(this->D_,this->K_);
+  Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> ps(this->D_,this->K_);
   for(uint32_t k=0; k<this->K_; ++k)
     if(this->cls_[k]->isInstantiated())
       ps.col(k) = this->cls_[k]->centroid();
@@ -333,7 +333,7 @@ VectorXu DDPMeansCUDA<double,Spherical<double> >::initLabels()
   d_ws_.set(this->weights());
 
   // TODO not too too sure about this
-  Matrix<double,Dynamic,Dynamic> ps(this->D_,this->K_);
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> ps(this->D_,this->K_);
   for(uint32_t k=0; k<this->K_; ++k)
     if(this->cls_[k]->isInstantiated())
       ps.col(k) = this->cls_[k]->centroid();

@@ -16,8 +16,8 @@ struct Euclidean //: public DataSpace<T>
   class Cluster
   {
     protected:
-    Matrix<T,Dynamic,1> centroid_;
-    Matrix<T,Dynamic,1> xSum_;
+    Eigen::Matrix<T,Eigen::Dynamic,1> centroid_;
+    Eigen::Matrix<T,Eigen::Dynamic,1> xSum_;
     uint32_t N_;
 
     public:
@@ -28,17 +28,17 @@ struct Euclidean //: public DataSpace<T>
     Cluster(uint32_t D) : centroid_(D,1), xSum_(0,1), N_(0)
     {};
 
-    Cluster(const Matrix<T,Dynamic,1>& x_i) : centroid_(x_i), xSum_(x_i), N_(1)
+    Cluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i) : centroid_(x_i), xSum_(x_i), N_(1)
     {};
 
-    Cluster(const Matrix<T,Dynamic,1>& xSum, uint32_t N) :
+    Cluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, uint32_t N) :
       centroid_(xSum), xSum_(xSum), N_(N)
     {if(N>0) centroid_/=N_;};
 
-    T dist (const Matrix<T,Dynamic,1>& x_i) const
+    T dist (const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i) const
     { return Euclidean::dist(this->centroid_, x_i); };
 
-    void computeSS(const Matrix<T,Dynamic,Dynamic>& x,  const VectorXu& z,
+    void computeSS(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,  const VectorXu& z,
         const uint32_t k)
     {
       const uint32_t D = x.rows();
@@ -53,7 +53,7 @@ struct Euclidean //: public DataSpace<T>
         }
       //TODO: cloud try to do sth more random here
       if(N_ == 0)
-        xSum_ = x.col(k); //Matrix<T,Dynamic,1>::Zero(D,1);
+        xSum_ = x.col(k); //Matrix<T,Eigen::Dynamic,1>::Zero(D,1);
     };
 
     void updateCenter()
@@ -84,7 +84,7 @@ struct Euclidean //: public DataSpace<T>
       centroid_ = cld->x()->col(rid);
     }
 
-    void computeCenter(const Matrix<T,Dynamic,Dynamic>& x,  const VectorXu& z,
+    void computeCenter(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,  const VectorXu& z,
         const uint32_t k)
     {
       computeSS(x,z,k);
@@ -95,9 +95,9 @@ struct Euclidean //: public DataSpace<T>
 
     uint32_t N() const {return N_;};
     uint32_t& N(){return N_;};
-    const Matrix<T,Dynamic,1>& centroid() const {return centroid_;};
-     Matrix<T,Dynamic,1>& centroid() {return centroid_;};
-    const Matrix<T,Dynamic,1>& xSum() const {return xSum_;};
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& centroid() const {return centroid_;};
+     Eigen::Matrix<T,Eigen::Dynamic,1>& centroid() {return centroid_;};
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum() const {return xSum_;};
   };
 
   class DependentCluster : public Cluster
@@ -110,7 +110,7 @@ struct Euclidean //: public DataSpace<T>
     T tau_;
     T lambda_;
     T Q_;
-    Matrix<T,Dynamic,1> prevCentroid_;
+    Eigen::Matrix<T,Eigen::Dynamic,1> prevCentroid_;
 
     public:
 
@@ -122,16 +122,16 @@ struct Euclidean //: public DataSpace<T>
       lambda_(1), Q_(1), prevCentroid_(this->centroid_)
     {};
 
-    DependentCluster(const Matrix<T,Dynamic,1>& x_i) : Cluster(x_i), t_(0),
+    DependentCluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i) : Cluster(x_i), t_(0),
       w_(0), tau_(1), lambda_(1), Q_(1), prevCentroid_(this->centroid_)
     {};
 
-    DependentCluster(const Matrix<T,Dynamic,1>& x_i, T tau, T lambda, T Q) :
+    DependentCluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i, T tau, T lambda, T Q) :
       Cluster(x_i), t_(0), w_(0), tau_(tau), lambda_(lambda), Q_(Q),
       prevCentroid_(this->centroid_)
     {};
 
-    DependentCluster(const Matrix<T,Dynamic,1>& x_i, const DependentCluster& cl0) :
+    DependentCluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i, const DependentCluster& cl0) :
       Cluster(x_i), t_(0), w_(0), tau_(cl0.tau()), lambda_(cl0.lambda()),
       Q_(cl0.Q()), prevCentroid_(this->centroid_)
     {};
@@ -151,8 +151,8 @@ struct Euclidean //: public DataSpace<T>
 
     void incAge() { ++ t_; };
 
-    const Matrix<T,Dynamic,1>& prevCentroid() const {return prevCentroid_;};
-    Matrix<T,Dynamic,1>& prevCentroid() {return prevCentroid_;};
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& prevCentroid() const {return prevCentroid_;};
+    Eigen::Matrix<T,Eigen::Dynamic,1>& prevCentroid() {return prevCentroid_;};
 
     void nextTimeStep()
     {
@@ -184,14 +184,14 @@ struct Euclidean //: public DataSpace<T>
       this->centroid_ = (this->centroid_ * gamma + this->xSum_)/(gamma+this->N_);
     };
 
-    void reInstantiate(const Matrix<T,Dynamic,Dynamic>& x_i)
+    void reInstantiate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x_i)
     {
       this->xSum_ = x_i; this->N_ = 1;
       reInstantiate();
     };
 
     T maxDist() const { return this->lambda_;};
-    T dist (const Matrix<T,Dynamic,1>& x_i) const
+    T dist (const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i) const
     {
       if(this->isInstantiated())
         return Euclidean::dist(this->centroid_, x_i);
@@ -209,10 +209,10 @@ struct Euclidean //: public DataSpace<T>
     uint32_t globalId; // id globally - only increasing id
   };
    
-  static T dist(const Matrix<T,Dynamic,1>& a, const Matrix<T,Dynamic,1>& b)
+  static T dist(const Eigen::Matrix<T,Eigen::Dynamic,1>& a, const Eigen::Matrix<T,Eigen::Dynamic,1>& b)
   { return (a-b).squaredNorm(); };
 
-  static T dissimilarity(const Matrix<T,Dynamic,1>& a, const Matrix<T,Dynamic,1>& b)
+  static T dissimilarity(const Eigen::Matrix<T,Eigen::Dynamic,1>& a, const Eigen::Matrix<T,Eigen::Dynamic,1>& b)
   { return (a-b).squaredNorm();};
 
   static bool closer(const T a, const T b) { return a<b; };
@@ -222,31 +222,31 @@ struct Euclidean //: public DataSpace<T>
       const std::vector<uint32_t> zs, uint32_t K,
       std::vector<Eigen::Matrix<T,D,1>,Eigen::aligned_allocator<Eigen::Matrix<T,D,1> > >& mus);
 
-  static Matrix<T,Dynamic,1> computeSum(const Matrix<T,Dynamic,Dynamic>& x, 
+  static Eigen::Matrix<T,Eigen::Dynamic,1> computeSum(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
       const VectorXu& z, const uint32_t k, uint32_t* N_k);
 
-  static Matrix<T,Dynamic,Dynamic> computeCenters(const
-      Matrix<T,Dynamic,Dynamic>& x, const VectorXu& z, const uint32_t K, 
+  static Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> computeCenters(const
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, const VectorXu& z, const uint32_t K, 
       VectorXu& Ns);
 
-  static Matrix<T,Dynamic,1> computeCenter(const Matrix<T,Dynamic,Dynamic>& x, 
+  static Eigen::Matrix<T,Eigen::Dynamic,1> computeCenter(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
       const VectorXu& z, const uint32_t k, uint32_t* N_k);
 
   // TODO deprecate soon and use cluster classes instead
-  static T distToUninstantiated(const Matrix<T,Dynamic,1>& x_i, const
-      Matrix<T,Dynamic,1>& ps_k, const T t_k, const T w_k, const T tau, 
+  static T distToUninstantiated(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i, const
+      Eigen::Matrix<T,Eigen::Dynamic,1>& ps_k, const T t_k, const T w_k, const T tau, 
       const T Q)
   { return dist(x_i, ps_k) / (tau*t_k+1.+ 1.0/w_k) + Q*t_k; };
 
   static bool clusterIsDead(const T t_k, const T lambda, const T Q)
   { return t_k*Q > lambda;};
 
-  static Matrix<T,Dynamic,1> reInstantiatedOldCluster(const
-      Matrix<T,Dynamic,1>& xSum, const T N_k, const Matrix<T,Dynamic,1>& ps_k, const T t_k,
+  static Eigen::Matrix<T,Eigen::Dynamic,1> reInstantiatedOldCluster(const
+      Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, const T N_k, const Eigen::Matrix<T,Eigen::Dynamic,1>& ps_k, const T t_k,
       const T w_k, const T tau);
   
-  static T updateWeight(const Matrix<T,Dynamic,1>& xSum, const uint32_t N_k,
-      const Matrix<T,Dynamic,1>& ps_k, const T t_k, const T w_k, const T tau)
+  static T updateWeight(const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, const uint32_t N_k,
+      const Eigen::Matrix<T,Eigen::Dynamic,1>& ps_k, const T t_k, const T w_k, const T tau)
   {return 1./(1./w_k + t_k*tau) + N_k;};
 
 };
@@ -270,12 +270,12 @@ void Euclidean<T>::computeCenters(const
 };
 
   template<typename T>                                                            
-Matrix<T,Dynamic,1> Euclidean<T>::computeSum(const Matrix<T,Dynamic,Dynamic>& x, 
+Matrix<T,Eigen::Dynamic,1> Euclidean<T>::computeSum(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
     const VectorXu& z, const uint32_t k, uint32_t* N_k)
 {
   const uint32_t D = x.rows();
   const uint32_t N = x.cols();
-  Matrix<T,Dynamic,1> xSum(D);
+  Eigen::Matrix<T,Eigen::Dynamic,1> xSum(D);
   xSum.setZero(D);
   if(N_k) *N_k = 0;
   for(uint32_t i=0; i<N; ++i)
@@ -288,12 +288,12 @@ Matrix<T,Dynamic,1> Euclidean<T>::computeSum(const Matrix<T,Dynamic,Dynamic>& x,
 };
 
 template<typename T>                                                            
-Matrix<T,Dynamic,Dynamic> Euclidean<T>::computeCenters(const
-    Matrix<T,Dynamic,Dynamic>& x, const VectorXu& z, const uint32_t K, 
+Matrix<T,Eigen::Dynamic,Eigen::Dynamic> Euclidean<T>::computeCenters(const
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, const VectorXu& z, const uint32_t K, 
     VectorXu& Ns)
 {
   const uint32_t D = x.rows();
-  Matrix<T,Dynamic,Dynamic> centroids(D,K);
+  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> centroids(D,K);
 #pragma omp parallel for 
   for(uint32_t k=0; k<K; ++k)
     centroids.col(k) = computeCenter(x,z,k,&Ns(k));
@@ -301,13 +301,13 @@ Matrix<T,Dynamic,Dynamic> Euclidean<T>::computeCenters(const
 };
 
 template<typename T>                                                            
-Matrix<T,Dynamic,1> Euclidean<T>::computeCenter(const Matrix<T,Dynamic,Dynamic>& x, 
+Matrix<T,Eigen::Dynamic,1> Euclidean<T>::computeCenter(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
     const VectorXu& z, const uint32_t k, uint32_t* N_k)
 {
   const uint32_t D = x.rows();
   const uint32_t N = x.cols();
   if(N_k) *N_k = 0;
-  Matrix<T,Dynamic,1> mean_k(D);
+  Eigen::Matrix<T,Eigen::Dynamic,1> mean_k(D);
   mean_k.setZero(D);
   for(uint32_t i=0; i<N; ++i)
     if(z(i) == k)
@@ -325,12 +325,12 @@ Matrix<T,Dynamic,1> Euclidean<T>::computeCenter(const Matrix<T,Dynamic,Dynamic>&
   }
   else
     //TODO: cloud try to do sth more random here
-    return x.col(k); //Matrix<T,Dynamic,1>::Zero(D,1);
+    return x.col(k); //Matrix<T,Eigen::Dynamic,1>::Zero(D,1);
 };
 
 template<typename T>                                                            
-Matrix<T,Dynamic,1> Euclidean<T>::reInstantiatedOldCluster(const
-    Matrix<T,Dynamic,1>& xSum, const T N_k, const Matrix<T,Dynamic,1>& ps_k, const T t_k, const
+Matrix<T,Eigen::Dynamic,1> Euclidean<T>::reInstantiatedOldCluster(const
+    Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, const T N_k, const Eigen::Matrix<T,Eigen::Dynamic,1>& ps_k, const T t_k, const
     T w_k, const T tau)
 {
   const T gamma = 1.0/(1.0/w_k + t_k*tau);

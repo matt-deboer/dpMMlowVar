@@ -15,7 +15,6 @@
 #include <dpMMlowVar/kmeans.hpp>
 
 
-using namespace Eigen;
 using std::cout;
 using std::endl;
 
@@ -109,7 +108,7 @@ void KMeansCUDA<T,DS>::updateCenters()
 template<class T, class DS>
 void KMeansCUDA<T,DS>::setupComputeLabelsGPU()
 {
-  Matrix<T,Dynamic,Dynamic> ps(this->D_,this->K_);
+  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> ps(this->D_,this->K_);
   for(uint32_t k=0; k<this->K_; ++k)
     ps.col(k) = this->cls_[k]->centroid();
   d_p_.set(ps);

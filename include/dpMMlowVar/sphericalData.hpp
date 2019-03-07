@@ -8,7 +8,6 @@
 #include <vector>
 #include <jsCore/clData.hpp>
 
-using namespace Eigen;
 using std::min;
 using std::max;
 
@@ -17,13 +16,13 @@ namespace dplv {
 /* rotation from point A to B; percentage specifies how far the rotation will 
  * bring us towards B [0,1] */
 template<typename T>
-inline Matrix<T,Dynamic,Dynamic> rotationFromAtoB(const Matrix<T,Dynamic,1>& a,
-    const Matrix<T,Dynamic,1>& b, T percentage=1.0)
+inline Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> rotationFromAtoB(const Eigen::Matrix<T,Eigen::Dynamic,1>& a,
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& b, T percentage=1.0)
 {
   assert(b.size() == a.size());
 
   uint32_t D_ = b.size();
-  Matrix<T,Dynamic,Dynamic> bRa(D_,D_);
+  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> bRa(D_,D_);
    
   T dot = b.transpose()*a;
   ASSERT(fabs(dot) <=1.0, "a="<<a.transpose()<<" |.| "<<a.norm()
@@ -34,12 +33,12 @@ inline Matrix<T,Dynamic,Dynamic> rotationFromAtoB(const Matrix<T,Dynamic,1>& a,
   if(fabs(dot -1.) < 1e-6)
   {
     // points are almost the same -> just put identity
-    bRa =  Matrix<T,Dynamic,Dynamic>::Identity(D_,D_);
+    bRa =  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::Identity(D_,D_);
   }else if(fabs(dot +1.) <1e-6) 
   {
     // direction does not matter since points are on opposing sides of sphere
     // -> pick one and rotate by percentage;
-    bRa = -Matrix<T,Dynamic,Dynamic>::Identity(D_,D_);
+    bRa = -Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::Identity(D_,D_);
     bRa(0,0) = cos(percentage*M_PI*0.5);
     bRa(1,1) = cos(percentage*M_PI*0.5);
     bRa(0,1) = -sin(percentage*M_PI*0.5);
@@ -47,13 +46,13 @@ inline Matrix<T,Dynamic,Dynamic> rotationFromAtoB(const Matrix<T,Dynamic,1>& a,
   }else{
     T alpha = acos(dot) * percentage;
 
-    Matrix<T,Dynamic,1> c(D_);
+    Eigen::Matrix<T,Eigen::Dynamic,1> c(D_);
     c = a - b*dot;
     ASSERT(c.norm() >1e-5, "c="<<c.transpose()<<" |.| "<<c.norm());
     c /= c.norm();
-    Matrix<T,Dynamic,Dynamic> A = b*c.transpose() - c*b.transpose();
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> A = b*c.transpose() - c*b.transpose();
 
-    bRa = Matrix<T,Dynamic,Dynamic>::Identity(D_,D_) + sin(alpha)*A + 
+    bRa = Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::Identity(D_,D_) + sin(alpha)*A + 
       (cos(alpha)-1.)*(b*b.transpose() + c*c.transpose());
   }
   return bRa;
@@ -66,8 +65,8 @@ struct Spherical //: public DataSpace<T>
   class Cluster
   {
     protected:
-    Matrix<T,Dynamic,1> centroid_;
-    Matrix<T,Dynamic,1> xSum_;
+    Eigen::Matrix<T,Eigen::Dynamic,1> centroid_;
+    Eigen::Matrix<T,Eigen::Dynamic,1> xSum_;
     uint32_t N_;
 
     public:
@@ -78,17 +77,17 @@ struct Spherical //: public DataSpace<T>
     Cluster(uint32_t D) : centroid_(D,1), xSum_(0,1), N_(0)
     {};
 
-    Cluster(const Matrix<T,Dynamic,1>& x_i) : centroid_(x_i), xSum_(x_i), N_(1)
+    Cluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i) : centroid_(x_i), xSum_(x_i), N_(1)
     {};
 
-    Cluster(const Matrix<T,Dynamic,1>& xSum, uint32_t N) :
+    Cluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, uint32_t N) :
       centroid_(xSum/xSum.norm()), xSum_(xSum), N_(N)
     {};
 
-    T dist (const Matrix<T,Dynamic,1>& x_i) const
+    T dist (const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i) const
     { return Spherical::dist(this->centroid_, x_i); };
 
-    void computeSS(const Matrix<T,Dynamic,Dynamic>& x,  const VectorXu& z,
+    void computeSS(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,  const VectorXu& z,
         const uint32_t k)
     {
       Spherical::computeSum(x,z,k,&N_);
@@ -96,7 +95,7 @@ struct Spherical //: public DataSpace<T>
       if(N_ == 0)
       {
         const uint32_t D = x.rows();
-        xSum_ = Matrix<T,Dynamic,1>::Zero(D);
+        xSum_ = Eigen::Matrix<T,Eigen::Dynamic,1>::Zero(D);
         xSum_(0) = 1.;
       }
     };
@@ -125,7 +124,7 @@ struct Spherical //: public DataSpace<T>
       centroid_ = cld->x()->col(rid);
     }
 
-    void computeCenter(const Matrix<T,Dynamic,Dynamic>& x,  const VectorXu& z,
+    void computeCenter(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x,  const VectorXu& z,
         const uint32_t k)
     {
       computeSS(x,z,k);
@@ -136,9 +135,9 @@ struct Spherical //: public DataSpace<T>
 
     uint32_t N() const {return N_;};
     uint32_t& N(){return N_;};
-    const Matrix<T,Dynamic,1>& centroid() const {return centroid_;};
-    Matrix<T,Dynamic,1>& centroid() {return centroid_;};
-    const Matrix<T,Dynamic,1>& xSum() const {return xSum_;};
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& centroid() const {return centroid_;};
+    Eigen::Matrix<T,Eigen::Dynamic,1>& centroid() {return centroid_;};
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum() const {return xSum_;};
   };
 
 
@@ -152,7 +151,7 @@ struct Spherical //: public DataSpace<T>
     T beta_;
     T lambda_;
     T Q_;
-    Matrix<T,Dynamic,1> prevCentroid_;
+    Eigen::Matrix<T,Eigen::Dynamic,1> prevCentroid_;
 
     public:
 
@@ -164,16 +163,16 @@ struct Spherical //: public DataSpace<T>
       lambda_(1), Q_(1), prevCentroid_(this->centroid_)
     {};
 
-    DependentCluster(const Matrix<T,Dynamic,1>& x_i) : Cluster(x_i), t_(0),
+    DependentCluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i) : Cluster(x_i), t_(0),
       w_(0), beta_(1), lambda_(1), Q_(1), prevCentroid_(this->centroid_)
     {};
 
-    DependentCluster(const Matrix<T,Dynamic,1>& x_i, T beta, T lambda, T Q) :
+    DependentCluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i, T beta, T lambda, T Q) :
       Cluster(x_i), t_(0), w_(0), beta_(beta), lambda_(lambda), Q_(Q), 
       prevCentroid_(this->centroid_)
     {};
 
-    DependentCluster(const Matrix<T,Dynamic,1>& x_i, const DependentCluster& cl0) :
+    DependentCluster(const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i, const DependentCluster& cl0) :
       Cluster(x_i), t_(0), w_(0), beta_(cl0.beta()), lambda_(cl0.lambda()),
       Q_(cl0.Q()), prevCentroid_(this->centroid_)
     {};
@@ -205,8 +204,8 @@ struct Spherical //: public DataSpace<T>
         <<"  center: "<<this->centroid().transpose()<<endl;
     };
 
-    const Matrix<T,Dynamic,1>& prevCentroid() const {return prevCentroid_;};
-    Matrix<T,Dynamic,1>& prevCentroid() {return prevCentroid_;};
+    const Eigen::Matrix<T,Eigen::Dynamic,1>& prevCentroid() const {return prevCentroid_;};
+    Eigen::Matrix<T,Eigen::Dynamic,1>& prevCentroid() {return prevCentroid_;};
 
     void nextTimeStep()
     {
@@ -237,14 +236,14 @@ struct Spherical //: public DataSpace<T>
           this->prevCentroid_, eta/(phi*t_+theta+eta)) * this->xSum_/this->xSum_.norm(); 
     };
 
-    void reInstantiate(const Matrix<T,Dynamic,Dynamic>& x_i)
+    void reInstantiate(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x_i)
     {
       this->xSum_ = x_i; this->N_ = 1;
       reInstantiate();
     };
 
     T maxDist() const { return this->lambda_+1.;};
-    T dist (const Matrix<T,Dynamic,1>& x_i) const
+    T dist (const Eigen::Matrix<T,Eigen::Dynamic,1>& x_i) const
     {
       if(this->isInstantiated())
         return Spherical::dist(this->centroid_, x_i);
@@ -273,12 +272,12 @@ struct Spherical //: public DataSpace<T>
     uint32_t globalId; // id globally - only increasing id
   };
 
-  static T dist(const Matrix<T,Dynamic,1>& a, 
-      const Matrix<T,Dynamic,1>& b)
+  static T dist(const Eigen::Matrix<T,Eigen::Dynamic,1>& a, 
+      const Eigen::Matrix<T,Eigen::Dynamic,1>& b)
   { return a.transpose()*b; };
 
-  static T dissimilarity(const Matrix<T,Dynamic,1>& a, 
-      const Matrix<T,Dynamic,1>& b)
+  static T dissimilarity(const Eigen::Matrix<T,Eigen::Dynamic,1>& a, 
+      const Eigen::Matrix<T,Eigen::Dynamic,1>& b)
   { return acos(min(static_cast<T>(1.0),max(static_cast<T>(-1.0),
           (a.transpose()*b)(0)))); };
 
@@ -294,16 +293,16 @@ struct Spherical //: public DataSpace<T>
 
   static void solveProblem1(T gamma, T age, const T beta, T& phi, 
       T& theta); 
-  static void solveProblem2(const Matrix<T,Dynamic,1>& xSum, T zeta, 
+  static void solveProblem2(const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, T zeta, 
       T age, T w, const T beta, T& phi, T& theta, T& eta); 
 
   static void solveProblem1Approx(T gamma, T age, const T beta, T& phi, 
       T& theta); 
-  static void solveProblem2Approx(const Matrix<T,Dynamic,1>& xSum, 
+  static void solveProblem2Approx(const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, 
       T zeta, T age, T w, const T beta, T& phi, T& theta, T& eta); 
 
-  static Matrix<T,Dynamic,1> computeSum(const 
-      Matrix<T,Dynamic,Dynamic>& x, const VectorXu& z, const uint32_t k,
+  static Eigen::Matrix<T,Eigen::Dynamic,1> computeSum(const 
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, const VectorXu& z, const uint32_t k,
       uint32_t* N_k);
 
 };
@@ -326,12 +325,12 @@ void Spherical<T>::computeCenters(const
 };
 
   template<typename T>                                                            
-Matrix<T,Dynamic,1> Spherical<T>::computeSum(const Matrix<T,Dynamic,Dynamic>& x, 
+Matrix<T,Eigen::Dynamic,1> Spherical<T>::computeSum(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x, 
     const VectorXu& z, const uint32_t k, uint32_t* N_k)
 {
   const uint32_t D = x.rows();
   const uint32_t N = x.cols();
-  Matrix<T,Dynamic,1> xSum(D);
+  Eigen::Matrix<T,Eigen::Dynamic,1> xSum(D);
   xSum.setZero(D);
   if(N_k) *N_k = 0;
   for(uint32_t i=0; i<N; ++i)
@@ -370,7 +369,7 @@ void Spherical<T>::solveProblem1(T gamma, T age, const T beta, T& phi, T& theta)
 
 
 template<class T>
-void Spherical<T>::solveProblem2(const Matrix<T,Dynamic,1>& xSum, T zeta, 
+void Spherical<T>::solveProblem2(const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum, T zeta, 
     T age, T w, const T beta, T& phi, T& theta, T& eta)
 {
   // solves
@@ -429,7 +428,7 @@ void Spherical<T>::solveProblem1Approx(T gamma, T age, const T beta, T& phi, T& 
 
 
 template<class T>
-void Spherical<T>::solveProblem2Approx(const Matrix<T,Dynamic,1>& xSum,
+void Spherical<T>::solveProblem2Approx(const Eigen::Matrix<T,Eigen::Dynamic,1>& xSum,
     T zeta, T age, T w, const T beta, T& phi, T& theta, T& eta)
 {
   // solves
@@ -452,12 +451,12 @@ double silhouetteClD<double, dplv::Spherical<double> >(const
 { 
   if(cld.K()<2) return -1.0;
 //  assert(Ns_.sum() == N_);
-  Matrix<double,Dynamic,1> sil(cld.N());
-  Matrix<double,Dynamic,Dynamic> xSums = cld.xSums();
+  Eigen::Matrix<double,Eigen::Dynamic,1> sil(cld.N());
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> xSums = cld.xSums();
 #pragma omp parallel for
   for(uint32_t i=0; i<cld.N(); ++i)
   {
-    Matrix<double,Dynamic,1> b = Matrix<double,Dynamic,1>::Zero(cld.K());
+    Eigen::Matrix<double,Eigen::Dynamic,1> b = Eigen::Matrix<double,Eigen::Dynamic,1>::Zero(cld.K());
     for(uint32_t k=0; k<cld.K(); ++k)
       if (k == cld.z(i))
         b(k) = 1.-(cld.x()->col(i).transpose()*(xSums.col(k) - cld.x()->col(i)))(0)/static_cast<double>(cld.count(k));
@@ -486,12 +485,12 @@ float silhouetteClD<float, dplv::Spherical<float> >(const
 { 
   if(cld.K()<2) return -1.0;
 //  assert(Ns_.sum() == N_);
-  Matrix<float,Dynamic,1> sil(cld.N());
-  Matrix<float,Dynamic,Dynamic> xSums = cld.xSums();
+  Eigen::Matrix<float,Eigen::Dynamic,1> sil(cld.N());
+  Eigen::Matrix<float,Eigen::Dynamic,Eigen::Dynamic> xSums = cld.xSums();
 #pragma omp parallel for
   for(uint32_t i=0; i<cld.N(); ++i)
   {
-    Matrix<float,Dynamic,1> b = Matrix<float,Dynamic,1>::Zero(cld.K());
+    Eigen::Matrix<float,Eigen::Dynamic,1> b = Eigen::Matrix<float,Eigen::Dynamic,1>::Zero(cld.K());
     for(uint32_t k=0; k<cld.K(); ++k)
       if (k == cld.z(i))
         b(k) = 1.-(cld.x()->col(i).transpose()*(xSums.col(k) - cld.x()->col(i)))(0)/static_cast<float>(cld.count(k));

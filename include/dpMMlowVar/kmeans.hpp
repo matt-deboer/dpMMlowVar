@@ -12,7 +12,6 @@
 #include <dpMMlowVar/sphericalData.hpp>
 #include <dpMMlowVar/euclideanData.hpp>
 
-using namespace Eigen;
 using std::cout;
 using std::endl;
 
@@ -22,13 +21,13 @@ template<class T, class DS>
 class KMeans : public Clusterer<T,DS>
 {
 public:
-  KMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K);
+  KMeans(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx, uint32_t K);
   KMeans(const boost::shared_ptr<jsc::ClData<T> >& cld);
   virtual ~KMeans();
 
   virtual void updateLabels();
   virtual void updateCenters();
-  virtual MatrixXu mostLikelyInds(uint32_t n, Matrix<T,Dynamic,Dynamic>& deviates);
+  virtual MatrixXu mostLikelyInds(uint32_t n, Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& deviates);
   virtual T avgIntraClusterDeviation();
 
   virtual uint32_t indOfClosestCluster(int32_t i, T& sim_closest);
@@ -67,7 +66,7 @@ typedef KMeans<float, Spherical<float> > spkmf;
 // --------------------------- impl -------------------------------------------
 template<class T, class DS>
 KMeans<T,DS>::KMeans(
-    const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K)
+    const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx, uint32_t K)
   : Clusterer<T,DS>(spx,K)
 {}
 
@@ -133,10 +132,10 @@ void KMeans<T,DS>::updateCenters()
 
 template<class T, class DS>
 MatrixXu KMeans<T,DS>::mostLikelyInds(uint32_t n, 
-    Matrix<T,Dynamic,Dynamic>& deviates)
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& deviates)
 {
   MatrixXu inds = MatrixXu::Zero(n,this->K_);
-  deviates = Matrix<T,Dynamic,Dynamic>::Ones(n,this->K_);
+  deviates = Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>::Ones(n,this->K_);
   deviates *= 99999.0;
   
 #pragma omp parallel for 
@@ -157,7 +156,7 @@ MatrixXu KMeans<T,DS>::mostLikelyInds(uint32_t n,
             deviates(j,k) = deviate;
             inds(j,k) = i;
 //            cout<<"after update "<<logLike<<endl;
-//            Matrix<T,Dynamic,Dynamic> out(n,this->K_*2);
+//            Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> out(n,this->K_*2);
 //            out<<logLikes.cast<T>(),inds.cast<T>();
 //            cout<<out<<endl;
             break;
@@ -174,7 +173,7 @@ MatrixXu KMeans<T,DS>::mostLikelyInds(uint32_t n,
 template<class T, class DS>
 T KMeans<T,DS>::avgIntraClusterDeviation()
 {
-  Matrix<T,Dynamic,1> deviates(this->K_);
+  Eigen::Matrix<T,Eigen::Dynamic,1> deviates(this->K_);
   deviates.setZero(this->K_);
 #pragma omp parallel for 
   for (uint32_t k=0; k<this->K_; ++k)

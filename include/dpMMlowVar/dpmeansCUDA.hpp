@@ -16,7 +16,6 @@
 #include <dpMMlowVar/euclideanData.hpp>
 #include <dpMMlowVar/sphericalData.hpp>
 
-using namespace Eigen;
 using std::cout;
 using std::endl;
 
@@ -151,7 +150,7 @@ void DPMeansCUDA<T,DS>::setupComputeLabelsGPU(uint32_t iAction)
 {
   d_iAction_.set(iAction);
 
-  Matrix<T,Dynamic,Dynamic> ps(this->D_,this->K_);
+  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> ps(this->D_,this->K_);
   for(uint32_t k=0; k<this->K_; ++k) {
 //    if(this->cls_[k]->isInstantiated())
 //      std::cout << "ERROR: found empty cluster" << std::endl;

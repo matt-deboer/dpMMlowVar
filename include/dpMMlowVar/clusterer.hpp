@@ -10,7 +10,6 @@
 #include <jsCore/global.hpp>
 #include <jsCore/clData.hpp>
 
-using namespace Eigen;
 using std::vector;
 
 namespace dplv {
@@ -23,15 +22,15 @@ public:
   Clusterer(const boost::shared_ptr<jsc::ClData<T> >& cld);
   virtual ~Clusterer();
 
-//  void initialize(const Matrix<T,Dynamic,Dynamic>& x);
+//  void initialize(const Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& x);
 
   virtual void updateLabels() = 0;
   virtual void updateCenters() = 0;
   virtual MatrixXu mostLikelyInds(uint32_t n, 
-      Matrix<T,Dynamic,Dynamic>& deviates) = 0;
+      Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>& deviates) = 0;
   virtual T avgIntraClusterDeviation() = 0;
 
-  virtual void nextTimeStep(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx);
+  virtual void nextTimeStep(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx);
   virtual void updateState(){}; // after converging for a single time instant
   
   const VectorXu& z() const {return (this->cld_->z());};
@@ -40,8 +39,8 @@ public:
     for(uint32_t k=0; k<K_; ++k) Ns(k) = cls_[k]->N();
     return Ns;
   };
-  Matrix<T,Dynamic,Dynamic> centroids() const {
-    Matrix<T,Dynamic,Dynamic> ps(D_,K_);
+  Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> centroids() const {
+    Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> ps(D_,K_);
     for(uint32_t k=0; k<K_; ++k)                                                
       ps.col(k) = cls_[k]->centroid();
     return ps;
@@ -50,11 +49,11 @@ public:
   uint32_t globalInd(uint32_t k) const {return cls_[k]->globalId;};
 
   // natural distance to be used by the algorithm
-//  virtual T dist(const Matrix<T,Dynamic,1>& a, const Matrix<T,Dynamic,1>& b) = 0;
+//  virtual T dist(const Eigen::Matrix<T,Eigen::Dynamic,1>& a, const Eigen::Matrix<T,Eigen::Dynamic,1>& b) = 0;
   // closer in the sense of distance defined above
 //  virtual bool closer(T a, T b) = 0;
   // measure of disimilarity between two points (not necessarily the distance)
-//  virtual T dissimilarity(const Matrix<T,Dynamic,1>& a, const Matrix<T,Dynamic,1>& b) = 0;
+//  virtual T dissimilarity(const Eigen::Matrix<T,Eigen::Dynamic,1>& a, const Eigen::Matrix<T,Eigen::Dynamic,1>& b) = 0;
 
   virtual uint32_t getK(){return K_;};
   virtual uint32_t K(){return K_;}; 
@@ -73,14 +72,14 @@ protected:
   uint32_t N_;
   T cost_, prevCost_;
   boost::shared_ptr<jsc::ClData<T> > cld_;
-//  boost::shared_ptr<Matrix<T,Dynamic,Dynamic> > spx_; // pointer to data
+//  boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > spx_; // pointer to data
   vector< boost::shared_ptr<typename DS::DependentCluster> > cls_; // clusters
 //  VectorXu z_; // labels
 };
 
 // ----------------------------- impl -----------------------------------------
 template<class T, class DS>
-Clusterer<T,DS>::Clusterer( const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx,
+Clusterer<T,DS>::Clusterer( const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx,
     uint32_t K)
   : K_(K), D_(spx->rows()), N_(spx->cols()), cost_(INFINITY), prevCost_(INFINITY),
   cld_(new jsc::ClData<T>(spx,K))
@@ -107,7 +106,7 @@ Clusterer<T,DS>::Clusterer(const boost::shared_ptr<jsc::ClData<T> >& cld)
 };
 
 template<class T, class DS>
-void Clusterer<T,DS>::nextTimeStep(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx)
+void Clusterer<T,DS>::nextTimeStep(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx)
 {
   // reset cluster centers
   cls_.clear();
@@ -135,11 +134,11 @@ T Clusterer<T,DS>::silhouette()
   return jsc::silhouetteClD<T,DS>(*this->cld_);
 //  if(K_<2) return -1.0;
 ////  assert(Ns_.sum() == N_);
-//  Matrix<T,Dynamic,1> sil(N_);
+//  Eigen::Matrix<T,Eigen::Dynamic,1> sil(N_);
 //#pragma omp parallel for
 //  for(uint32_t i=0; i<N_; ++i)
 //  {
-//    Matrix<T,Dynamic,1> b = Matrix<T,Dynamic,1>::Zero(K_);
+//    Eigen::Matrix<T,Eigen::Dynamic,1> b = Eigen::Matrix<T,Eigen::Dynamic,1>::Zero(K_);
 //    for(uint32_t j=0; j<N_; ++j)
 //      if(j != i)
 //      {
