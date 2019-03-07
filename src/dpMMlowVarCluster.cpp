@@ -75,7 +75,7 @@ int main(int argc, char **argv)
   if (vm.count("D")) D = vm["D"].as<int>();
   cout << "T="<<T<<endl;
   // DP alpha parameter
-  VectorXd alpha(K);
+ Eigen::VectorXd alpha(K);
   alpha.setOnes(K);
   if (vm.count("alpha"))
   {

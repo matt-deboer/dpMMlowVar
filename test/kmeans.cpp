@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(kmeans_test)
 //      cout<<" -- t = "<<t<<endl;
 //      if(t<4)
 //        for (uint32_t i=0; i<N; ++i)
-//          spx->col(i) = spx->col(i) + VectorXd::Ones(D)*0.1;
+//          spx->col(i) = spx->col(i) +Eigen::VectorXd::Ones(D)*0.1;
 //      else if(t==7)
 //        for (uint32_t i=0; i<N/2; ++i)
 //          spx->col(i+N/2) = spx->col(i); // single cluster from now on
