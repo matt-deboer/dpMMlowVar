@@ -27,7 +27,7 @@ BUILD_TYPE="Release"
 endif
 
 all: pod-build/Makefile
-	$(MAKE) -C pod-build all install
+	$(MAKE) -C pod-build all install BUILD_PREFIX=$(BUILD_PREFIX)
 
 main:
 	@[ -d $(BUILD_PREFIX) ] || mkdir -p $(BUILD_PREFIX) || exit 1
