@@ -19,8 +19,8 @@ template<class T, class DS>
 class Clusterer
 {
 public:
-  Clusterer(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K);
-  Clusterer(const shared_ptr<jsc::ClData<T> >& cld);
+  Clusterer(const boost::shared_ptr<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> >& spx, uint32_t K);
+  Clusterer(const boost::shared_ptr<jsc::ClData<T> >& cld);
   virtual ~Clusterer();
 
 //  void initialize(const Matrix<T,Dynamic,Dynamic>& x);
@@ -31,7 +31,7 @@ public:
       Matrix<T,Dynamic,Dynamic>& deviates) = 0;
   virtual T avgIntraClusterDeviation() = 0;
 
-  virtual void nextTimeStep(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx);
+  virtual void nextTimeStep(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx);
   virtual void updateState(){}; // after converging for a single time instant
   
   const VectorXu& z() const {return (this->cld_->z());};
@@ -72,47 +72,47 @@ protected:
   const uint32_t D_;
   uint32_t N_;
   T cost_, prevCost_;
-  shared_ptr<jsc::ClData<T> > cld_;
-//  shared_ptr<Matrix<T,Dynamic,Dynamic> > spx_; // pointer to data
-  vector< shared_ptr<typename DS::DependentCluster> > cls_; // clusters
+  boost::shared_ptr<jsc::ClData<T> > cld_;
+//  boost::shared_ptr<Matrix<T,Dynamic,Dynamic> > spx_; // pointer to data
+  vector< boost::shared_ptr<typename DS::DependentCluster> > cls_; // clusters
 //  VectorXu z_; // labels
 };
 
 // ----------------------------- impl -----------------------------------------
 template<class T, class DS>
-Clusterer<T,DS>::Clusterer( const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx,
+Clusterer<T,DS>::Clusterer( const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx,
     uint32_t K)
   : K_(K), D_(spx->rows()), N_(spx->cols()), cost_(INFINITY), prevCost_(INFINITY),
   cld_(new jsc::ClData<T>(spx,K))
 {
   for (uint32_t k=0; k<K_; ++k)
   {
-    cls_.push_back(shared_ptr<typename DS::DependentCluster >(
+    cls_.push_back(boost::shared_ptr<typename DS::DependentCluster >(
           new typename DS::DependentCluster(D_)));
     cls_[k]->globalId = k;
   }
 };
 
 template<class T, class DS>
-Clusterer<T,DS>::Clusterer(const shared_ptr<jsc::ClData<T> >& cld)
+Clusterer<T,DS>::Clusterer(const boost::shared_ptr<jsc::ClData<T> >& cld)
   : K_(cld->K()), D_(cld->D()), N_(cld->N()), cost_(INFINITY), prevCost_(INFINITY),
   cld_(cld)
 {
   for (uint32_t k=0; k<K_; ++k)
   {
-    cls_.push_back(shared_ptr<typename DS::DependentCluster >(
+    cls_.push_back(boost::shared_ptr<typename DS::DependentCluster >(
           new typename DS::DependentCluster(D_)));
     cls_[k]->globalId = k;
   }
 };
 
 template<class T, class DS>
-void Clusterer<T,DS>::nextTimeStep(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx)
+void Clusterer<T,DS>::nextTimeStep(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx)
 {
   // reset cluster centers
   cls_.clear();
   for (uint32_t k=0; k<K_; ++k)
-    cls_.push_back(shared_ptr<typename DS::DependentCluster >(new typename DS::DependentCluster()));
+    cls_.push_back(boost::shared_ptr<typename DS::DependentCluster >(new typename DS::DependentCluster()));
   // update the data
   this->cld_->updateData(spx);
   this->N_ = this->cld_->N();

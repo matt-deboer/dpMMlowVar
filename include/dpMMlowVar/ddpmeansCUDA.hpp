@@ -60,7 +60,7 @@ template<class T, class DS>
 class DDPMeansCUDA : public DDPMeans<T,DS>
 {
 public:
-  DDPMeansCUDA(const shared_ptr<jsc::ClDataGpu<T> >& cld,
+  DDPMeansCUDA(const boost::shared_ptr<jsc::ClDataGpu<T> >& cld,
       T lambda, T Q, T tau);
   virtual ~DDPMeansCUDA();
   
@@ -89,7 +89,7 @@ protected:
 // --------------------------- impl -------------------------------------------
 
 template<class T, class DS>
-DDPMeansCUDA<T,DS>::DDPMeansCUDA(const shared_ptr<jsc::ClDataGpu<T> >& cld,
+DDPMeansCUDA<T,DS>::DDPMeansCUDA(const boost::shared_ptr<jsc::ClDataGpu<T> >& cld,
       T lambda, T Q, T tau)
   : DDPMeans<T,DS>(cld,lambda,Q,tau), //d_x_(cld), d_z_(this->N_),
   d_iAction_(1), d_ages_(1), d_ws_(1), d_Ns_(1), d_p_(this->D_,1)
@@ -105,7 +105,7 @@ template<class T, class DS> void DDPMeansCUDA<T,DS>::nextTimeStepGpu(T*
 //  this->clsPrev_.clear();
   for (uint32_t k =0; k< this->K_; ++k)
   {
-//    this->clsPrev_.push_back(shared_ptr<typename
+//    this->clsPrev_.push_back(boost::shared_ptr<typename
 //        DS::DependentCluster>(this->cls_[k]->clone())); 
     this->cls_[k]->nextTimeStep();
   }

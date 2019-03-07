@@ -22,8 +22,8 @@ template<class T, class DS>
 class KMeans : public Clusterer<T,DS>
 {
 public:
-  KMeans(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K);
-  KMeans(const shared_ptr<jsc::ClData<T> >& cld);
+  KMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K);
+  KMeans(const boost::shared_ptr<jsc::ClData<T> >& cld);
   virtual ~KMeans();
 
   virtual void updateLabels();
@@ -67,12 +67,12 @@ typedef KMeans<float, Spherical<float> > spkmf;
 // --------------------------- impl -------------------------------------------
 template<class T, class DS>
 KMeans<T,DS>::KMeans(
-    const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K)
+    const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K)
   : Clusterer<T,DS>(spx,K)
 {}
 
 template<class T, class DS>
-KMeans<T,DS>::KMeans( const shared_ptr<jsc::ClData<T> >& cld)
+KMeans<T,DS>::KMeans( const boost::shared_ptr<jsc::ClData<T> >& cld)
   : Clusterer<T,DS>(cld)
 {}
 

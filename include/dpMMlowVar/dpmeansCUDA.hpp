@@ -40,7 +40,7 @@ template<class T, class DS>
 class DPMeansCUDA : public DPMeans<T,DS>
 {
 public:
-  DPMeansCUDA(const shared_ptr<jsc::ClDataGpu<T> >& cld, double lambda);
+  DPMeansCUDA(const boost::shared_ptr<jsc::ClDataGpu<T> >& cld, double lambda);
   virtual ~DPMeansCUDA();
 
   // TODO: need an add data functionality
@@ -66,7 +66,7 @@ protected:
 
 // -------------------------------- impl ----------------------------------
 template<class T, class DS>
-DPMeansCUDA<T,DS>::DPMeansCUDA(const shared_ptr<jsc::ClDataGpu<T> >&
+DPMeansCUDA<T,DS>::DPMeansCUDA(const boost::shared_ptr<jsc::ClDataGpu<T> >&
     cld, double lambda)
   : DPMeans<T,DS>(cld, lambda), d_iAction_(1), d_p_(this->D_,1)
 {}
@@ -90,7 +90,7 @@ void DPMeansCUDA<T,DS>::updateLabels()
       uint32_t z_i = this->indOfClosestCluster(idAction,sim);
 //      std::cout << "z_i=" << z_i << std::endl;
       if(z_i == this->K_) {
-        this->cls_.push_back(shared_ptr<typename DS::DependentCluster>(new
+        this->cls_.push_back(boost::shared_ptr<typename DS::DependentCluster>(new
               typename DS::DependentCluster(this->cld_->x()->col(idAction))));
         this->K_ ++;
 //        std::cout << "# " << this->cls_.size() << " K=" << this->K_ << std::endl;

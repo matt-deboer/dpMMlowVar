@@ -35,7 +35,7 @@ template<class T, class DS>
 class KMeansCUDA : public KMeans<T,DS>
 {
 public:
-  KMeansCUDA(const shared_ptr<jsc::ClDataGpu<T> >& cld);
+  KMeansCUDA(const boost::shared_ptr<jsc::ClDataGpu<T> >& cld);
   virtual ~KMeansCUDA();
 
   virtual void updateLabels();
@@ -58,7 +58,7 @@ typedef KMeansCUDA<float, Spherical<float> > spkmCUDAf;
 
 // ------------------------- impl --------------------------------------
 template<class T, class DS>
-KMeansCUDA<T,DS>::KMeansCUDA( const shared_ptr<jsc::ClDataGpu<T> >& cld)
+KMeansCUDA<T,DS>::KMeansCUDA( const boost::shared_ptr<jsc::ClDataGpu<T> >& cld)
   : KMeans<T,DS>(cld), d_p_(this->D_,cld->K())
 {}
 
@@ -74,7 +74,7 @@ void KMeansCUDA<T,DS>::nextTimeStepGpu(T* d_x, uint32_t N, uint32_t step,
   {
     this->cls_.clear();
     for (uint32_t k=0; k<this->K_; ++k)
-      this->cls_.push_back(shared_ptr<typename DS::DependentCluster >(
+      this->cls_.push_back(boost::shared_ptr<typename DS::DependentCluster >(
             new typename DS::DependentCluster()));
   }
   this->cld_->updateData(d_x,N,step,offset);

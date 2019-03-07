@@ -20,9 +20,9 @@ template<class T, class DS>
 class DPMeans : public KMeans<T,DS>
 {
 public:
-  DPMeans(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K0,
+  DPMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, uint32_t K0,
     double lambda);
-  DPMeans(const shared_ptr<jsc::ClData<T> >& cld, double lambda);
+  DPMeans(const boost::shared_ptr<jsc::ClData<T> >& cld, double lambda);
   virtual ~DPMeans();
 
 //  void initialize(const Matrix<T,Dynamic,Dynamic>& x);
@@ -37,13 +37,13 @@ protected:
 
 // -------------------------------- impl ----------------------------------
 template<class T, class DS>
-DPMeans<T,DS>::DPMeans(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, 
+DPMeans<T,DS>::DPMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, 
     uint32_t K0, double lambda)
   : KMeans<T,DS>(spx,K0), lambda_(lambda)
 {}
 
 template<class T, class DS>
-DPMeans<T,DS>::DPMeans(const shared_ptr<jsc::ClData<T> >& cld, double lambda)
+DPMeans<T,DS>::DPMeans(const boost::shared_ptr<jsc::ClData<T> >& cld, double lambda)
   : KMeans<T,DS>(cld), lambda_(lambda)
 {}
 
@@ -82,7 +82,7 @@ void DPMeans<T,DS>::updateLabels()
 
     if(z_i == this->K_) 
     {
-      this->cls_.push_back(shared_ptr<typename DS::DependentCluster>(new
+      this->cls_.push_back(boost::shared_ptr<typename DS::DependentCluster>(new
             typename DS::DependentCluster(this->cld_->x()->col(i))));
       this->K_ ++;
     }

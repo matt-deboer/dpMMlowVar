@@ -65,20 +65,20 @@ struct Euclidean //: public DataSpace<T>
 //        centroid_ = xSum_;
     };
 
-    void updateSS(const shared_ptr<jsc::ClData<T> >& cld, uint32_t k)
+    void updateSS(const boost::shared_ptr<jsc::ClData<T> >& cld, uint32_t k)
     {
       xSum_ = cld->xSum(k);
       N_ = cld->count(k);
     };
 
-    void updateCenter(const shared_ptr<jsc::ClData<T> >& cld, uint32_t k)
+    void updateCenter(const boost::shared_ptr<jsc::ClData<T> >& cld, uint32_t k)
     {
       updateSS(cld,k); 
       updateCenter();
 //      cout<<centroid_.transpose()<<endl;
     };
 
-    void resetCenter(const shared_ptr<jsc::ClData<T> >& cld)
+    void resetCenter(const boost::shared_ptr<jsc::ClData<T> >& cld)
     {
       int rid = int(floor(cld->N()*double(std::rand())/double(RAND_MAX)));
       centroid_ = cld->x()->col(rid);

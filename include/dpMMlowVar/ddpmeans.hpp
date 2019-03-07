@@ -21,9 +21,9 @@ template<class T, class DS>
 class DDPMeans : public DPMeans<T,DS>
 {
 public:
-  DDPMeans(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx,
+  DDPMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx,
       T lambda, T Q, T tau);
-  DDPMeans(const shared_ptr<jsc::ClData<T> >& cld,
+  DDPMeans(const boost::shared_ptr<jsc::ClData<T> >& cld,
       T lambda, T Q, T tau);
   virtual ~DDPMeans();
 
@@ -32,8 +32,8 @@ public:
   virtual void updateCenters();
   
   virtual void initRevive();
-  virtual void nextTimeStep(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, bool reviveOnInit=true);
-//  virtual void nextTimeStep(const shared_ptr<jsc::ClData<T> >& cld);
+  virtual void nextTimeStep(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, bool reviveOnInit=true);
+//  virtual void nextTimeStep(const boost::shared_ptr<jsc::ClData<T> >& cld);
   virtual void updateState(bool verbose=false); // after converging for a single time instant
 
   virtual uint32_t indOfClosestCluster(int32_t i, T& sim_closest);
@@ -74,7 +74,7 @@ protected:
   typename DS::DependentCluster cl0_;
   uint32_t globalMaxInd_;
 
-  //vector< shared_ptr<typename DS::DependentCluster> > clsPrev_; //
+  //vector< boost::shared_ptr<typename DS::DependentCluster> > clsPrev_; //
   //prev clusters 
 
   virtual uint32_t optimisticLabelsAssign(uint32_t i0);
@@ -83,7 +83,7 @@ protected:
 
 // -------------------------------- impl ----------------------------------
 template<class T, class DS>
-DDPMeans<T,DS>::DDPMeans(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, 
+DDPMeans<T,DS>::DDPMeans(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, 
     T lambda, T Q, T tau)
   : DPMeans<T,DS>(spx,0,lambda), cl0_(tau,lambda,Q), globalMaxInd_(0)
 {
@@ -91,7 +91,7 @@ DDPMeans<T,DS>::DDPMeans(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx,
 };
 
 template<class T, class DS>
-DDPMeans<T,DS>::DDPMeans(const shared_ptr<jsc::ClData<T> >& cld, 
+DDPMeans<T,DS>::DDPMeans(const boost::shared_ptr<jsc::ClData<T> >& cld, 
     T lambda, T Q, T tau)
   : DPMeans<T,DS>(cld,lambda), cl0_(tau,lambda,Q), globalMaxInd_(0)
 {
@@ -168,7 +168,7 @@ void DDPMeans<T,DS>::createReviveFrom(uint32_t i)
   uint32_t z_i = this->indOfClosestCluster(i,sim);
   if(z_i == this->K_) 
   { // start a new cluster
-    this->cls_.push_back(shared_ptr<typename DS::DependentCluster>(new
+    this->cls_.push_back(boost::shared_ptr<typename DS::DependentCluster>(new
           typename DS::DependentCluster(this->cld_->x()->col(i),cl0_)));
     this->cls_[z_i]->globalId = this->globalMaxInd_++;
     this->K_ ++;
@@ -223,7 +223,7 @@ void DDPMeans<T,DS>::updateLabelsSerial()
     uint32_t z_i = indOfClosestCluster(i,sim);
     if(z_i == this->K_) 
     { // start a new cluster
-      this->cls_.push_back(shared_ptr<typename DS::DependentCluster>(new
+      this->cls_.push_back(boost::shared_ptr<typename DS::DependentCluster>(new
             typename DS::DependentCluster(this->cld_->x()->col(i),cl0_)));
       this->K_ ++;
     } else {
@@ -264,13 +264,13 @@ void DDPMeans<T,DS>::updateCenters()
 };
 
 template<class T, class DS>
-void DDPMeans<T,DS>::nextTimeStep(const shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, bool reviveOnInit)
+void DDPMeans<T,DS>::nextTimeStep(const boost::shared_ptr<Matrix<T,Dynamic,Dynamic> >& spx, bool reviveOnInit)
 {
 //  this->clsPrev_.clear();
 //#pragma omp parallel for 
   for (uint32_t k =0; k< this->K_; ++k)
   {
-//    clsPrev_.push_back(shared_ptr<typename
+//    clsPrev_.push_back(boost::shared_ptr<typename
 //        DS::DependentCluster>(this->cls_[k]->clone())); 
     this->cls_[k]->nextTimeStep();
   }
