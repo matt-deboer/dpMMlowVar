@@ -15,7 +15,6 @@
 #include <dpMMlowVar/sphericalData.hpp>
 
 
-using namespace Eigen;
 using std::cout;
 using std::endl;
 
