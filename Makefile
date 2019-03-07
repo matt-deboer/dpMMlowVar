@@ -67,7 +67,7 @@ configure:
 
 
 checkout:
-	git clone git@github.com:jstraub/jsCore
+	git clone https://github.com/matt-deboer/jsCore
 
 update:
 	cd jsCore; git pull; cd -
