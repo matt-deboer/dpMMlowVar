@@ -21,23 +21,23 @@ typedef Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> VXu;
 typedef Eigen::MatrixXf MXf;
 typedef Eigen::Vector3f V3f;
 
-using namespace std;
-using namespace cv;
+// using namespace std;
+// using namespace cv;
 using namespace dplv;
 namespace po = boost::program_options;
 
 int makeDirectory(const char* name);
-shared_ptr<MXf> extractVectorData(Mat& frame);
-Mat compress(int rw, int cl, VXu z, MXf p);
+shared_ptr<MXf> extractVectorData(cv::Mat& frame);
+cv::Mat compress(int rw, int cl, VXu z, MXf p);
 
-void printProgress(string pre, double pct);
+void printProgress(std::string pre, double pct);
 int main(int argc, char** argv){
 	// Set up the program options.
   	po::options_description desc("Option Flags");
   	desc.add_options()
   	  ("help,h", "produce help message")
-      ("input,i", po::value<string>(), "path to folder with surface normals")
-      ("frame_folder_name,f", po::value<string>()->default_value("frames"), "The folder to store frames in")
+      ("input,i", po::value<std::string>(), "path to folder with surface normals")
+      ("frame_folder_name,f", po::value<std::string>()->default_value("frames"), "The folder to store frames in")
       ("seed,s", po::value<int>()->default_value(time(0)), "Seed for the random number generator")
       ("lambda,l", po::value<double>(), "The value of lambda (in deg)")
       ("T_Q,t", po::value<double>(), "The value of T_Q (determines Q) - how many frames does a point survive")
@@ -54,10 +54,10 @@ int main(int argc, char** argv){
 		return 0;
 	}
 
-	string inputPath = vm["input"].as<string>();
+	std::string inputPath = vm["input"].as<std::string>();
 
 	//make the directory for storing frames if it doesn't already exist
-	if(makeDirectory(vm["frame_folder_name"].as<string>().c_str()) == -1){return -1;}
+	if(makeDirectory(vm["frame_folder_name"].as<std::string>().c_str()) == -1){return -1;}
 
 	//pull double constants from the command line using stream
 	double lambda = cos(vm["lambda"].as<double>()*M_PI/180.0) -1.; 
@@ -82,7 +82,7 @@ int main(int argc, char** argv){
 	for(;;){
     char fileName[100];
     sprintf(fileName,"/%05d.bin",fr);
-		Mat frame = imreadBinary(inputPath+std::string(fileName));
+		cv::Mat frame = imreadBinary(inputPath+std::string(fileName));
 		if(frame.rows == 0 || frame.cols == 0) break;
 
 		shared_ptr<MXf> data = extractVectorData(frame);
@@ -98,9 +98,9 @@ int main(int argc, char** argv){
     const MXf& p = clusterer->centroids();
     cout<<p<<endl;
     cout<<"z min/max: "<<z.maxCoeff()<<" "<<z.minCoeff()<<endl;
-//		Mat compressedFrame = compress(frame.rows, frame.cols, z, p);
+//		cv::Mat compressedFrame = compress(frame.rows, frame.cols, z, p);
 //		ostringstream oss;
-//		oss << vm["frame_folder_name"].as<string>() << "/" << setw(7) << setfill('0') << fr++ << ".png";
+//		oss << vm["frame_folder_name"].as<std::string>() << "/" << setw(7) << setfill('0') << fr++ << ".png";
 //		imwrite(oss.str(), compressedFrame, compression_params);
     ++ fr;
 	}
@@ -135,7 +135,7 @@ int makeDirectory(const char* name){
 	return 0;
 }
 
-void printProgress(string pre, double pct){
+void printProgress(std::string pre, double pct){
 	cout << pre << ": [";
 	int nEq = pct*50;
 	for (int i = 0; i < nEq; i++){
@@ -148,16 +148,16 @@ void printProgress(string pre, double pct){
 	///////////////////////////////space buffer after text to prevent weird looking output///////////////////////
 	"                                                                                                     \r"; //
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	cout << flush;
+	cout << std::flush;
 	return;
 }
 
-shared_ptr<MXf> extractVectorData(Mat& frame){
+shared_ptr<MXf> extractVectorData(cv::Mat& frame){
 	MXf* data = new MXf(3, frame.rows*frame.cols);
 	int idx = 0;
 	for(int y = 0; y < frame.rows; y++){
 		for (int x = 0; x <frame.cols; x++){
-      const Vec3f& vec = frame.at<Vec3f>(y, x);
+      const cv::Vec3f& vec = frame.at<cv::Vec3f>(y, x);
       (*data)(0, idx) = vec.val[0];
       (*data)(1, idx) = vec.val[1];
       (*data)(2, idx) = vec.val[2];
@@ -165,7 +165,7 @@ shared_ptr<MXf> extractVectorData(Mat& frame){
       idx++;
     }
 	}
-	//cout << "RGB: " << frame.at<Vec3b>(0, 0) << " Lab: " << frameLab.at<Vec3f>(0, 0) << " data: " << data[0].v.transpose() << endl;
+	//cout << "RGB: " << frame.at<Vec3b>(0, 0) << " Lab: " << frameLab.at<cv::Vec3f>(0, 0) << " data: " << data[0].v.transpose() << endl;
 	return shared_ptr<MXf>(data);
 }
 

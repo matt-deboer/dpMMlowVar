@@ -13,8 +13,7 @@
 #include <dpMMlowVar/dpmeans.hpp>
 #include <dpMMlowVar/ddpmeans.hpp>
 
-using namespace Eigen;
-using namespace std;
+
 using namespace dplv;
 namespace po = boost::program_options;
 
@@ -35,14 +34,14 @@ int main(int argc, char **argv)
       "alpha parameter of the DP (if single value assumes all alpha_i are the "
       "same")
     ("K,K", po::value<int>(), "number of initial clusters ")
-    ("base", po::value<string>(), 
+    ("base", po::value<std::string>(), 
       "which base measure to use (only spkm, kmeans, DPvMFmeans right now)")
     ("params,p", po::value< vector<double> >()->multitoken(), 
       "parameters of the base measure")
-    ("input,i", po::value<string>(), 
+    ("input,i", po::value<std::string>(), 
       "path to input dataset .csv file (rows: dimensions; cols: different "
       "datapoints)")
-    ("output,o", po::value<string>(), 
+    ("output,o", po::value<std::string>(), 
       "path to output labels .csv file (rows: time; cols: different "
       "datapoints)")
     ("mlInds", "output ml indices")
@@ -89,12 +88,12 @@ int main(int argc, char **argv)
   }
   cout << "alpha="<<alpha.transpose()<<endl;
 
-  shared_ptr<MatrixXd> spx(new MatrixXd(D,N));
-  MatrixXd& x(*spx);
-  string pathIn ="";
-  if(vm.count("input")) pathIn = vm["input"].as<string>();
+  shared_ptr<Eigen::MatrixXd> spx(new Eigen::MatrixXd(D,N));
+  Eigen::MatrixXd& x(*spx);
+  std::string pathIn ="";
+  if(vm.count("input")) pathIn = vm["input"].as<std::string>();
   cout<<"loading data of size " << D << "x" << N << " from "<<pathIn<<endl;
-  ifstream fin(pathIn.data(),ifstream::in);
+  std::ifstream fin(pathIn.data(),std::ifstream::in);
 //  fin >> D,N;
 
   vector<uint32_t> ind(N);
@@ -111,8 +110,8 @@ int main(int argc, char **argv)
     //cout<<x<<endl;
 
   // which base distribution
-  string base = "DPvMFmeans";
-  if(vm.count("base")) base = vm["base"].as<string>();
+  std::string base = "DPvMFmeans";
+  if(vm.count("base")) base = vm["base"].as<std::string>();
 
   if(base.compare("kmeans")){
     // normalize to unit length
@@ -158,17 +157,17 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  string pathOut ="./labels.csv";
+  std::string pathOut ="./labels.csv";
   if(vm.count("output")) 
-    pathOut = vm["output"].as<string>();
+    pathOut = vm["output"].as<std::string>();
   cout<<"output to "<<pathOut<<endl;
 
   double silhouette = -1.;
-  MatrixXd deviates;
-  MatrixXd centroids;
+  Eigen::MatrixXd deviates;
+  Eigen::MatrixXd centroids;
   MatrixXu inds;
-  ofstream fout(pathOut.data(),ofstream::out);
-  ofstream foutJointLike((pathOut+"_jointLikelihood.csv").data(),ofstream::out);
+  std::ofstream fout(pathOut.data(), std::ofstream::out);
+  std::ofstream foutJointLike((pathOut+"_jointLikelihood.csv").data(), std::ofstream::out);
   jsc::Timer watch;
   if(clustSp != NULL)
   {
@@ -240,7 +239,7 @@ int main(int argc, char **argv)
   if(vm.count("silhouette")) 
   {
     cout<<"silhouette = "<<silhouette<<" saved to "<<(pathOut+"_measures.csv")<<endl;
-    fout.open((pathOut+"_measures.csv").data(),ofstream::out);
+    fout.open((pathOut+"_measures.csv").data(),std::ofstream::out);
     fout<<silhouette<<endl;
     fout.close();
   }
@@ -250,16 +249,16 @@ int main(int argc, char **argv)
     cout<<"most likely indices"<<endl;
     cout<<inds<<endl;
     cout<<"----------------------------------------"<<endl;
-    fout.open((pathOut+"mlInds.csv").data(),ofstream::out);
+    fout.open((pathOut+"mlInds.csv").data(),std::ofstream::out);
     fout<<inds<<endl;
     fout.close();
-    fout.open((pathOut+"mlLogLikes.csv").data(),ofstream::out);
+    fout.open((pathOut+"mlLogLikes.csv").data(),std::ofstream::out);
     fout<<deviates<<endl;
     fout.close();
   }
   if(vm.count("centroids")) 
   {
-    ofstream foutMeans((pathOut+"_means.csv").data(),ofstream::out);
+    std::ofstream foutMeans((pathOut+"_means.csv").data(),std::ofstream::out);
     foutMeans << centroids <<endl;
     foutMeans.close();
   }

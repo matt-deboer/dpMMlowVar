@@ -10,9 +10,9 @@
 #include <vector>
 #include <algorithm>
 #include <eigen3/Eigen/Dense>
-#include<boost/program_options.hpp>
-#include<errno.h>
-#include<sys/stat.h>
+#include <boost/program_options.hpp>
+#include <errno.h>
+#include <sys/stat.h>
 //#include "kmeans.hpp"
 
 //#include <dmeans/core>
@@ -34,9 +34,7 @@ typedef Eigen::Vector3i V3i;
 typedef Eigen::Vector3d V3d;
 //typedef dmeans::VectorSpaceModel<3> VSModel;
 
-using namespace std;
-using namespace dplv;
-using namespace cv;
+
 namespace po = boost::program_options;
 
 
@@ -48,6 +46,11 @@ shared_ptr<MXf> extractVectorData(Mat& frame);
 cv::Mat posterize(int rw, int cl, VXu z, MXf p);
 
 int main(int argc, char** argv){
+
+	using namespace std;
+	using namespace dplv;
+	using namespace cv;
+
 	// Set up the program options.
   	po::options_description desc("Option Flags");
   	desc.add_options()

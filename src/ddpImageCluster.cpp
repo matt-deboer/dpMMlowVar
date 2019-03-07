@@ -34,9 +34,6 @@ typedef Eigen::Vector3i V3i;
 typedef Eigen::Vector3d V3d;
 //typedef dmeans::VectorSpaceModel<3> VSModel;
 
-using namespace std;
-using namespace dplv;
-using namespace cv;
 namespace po = boost::program_options;
 
 
@@ -49,6 +46,11 @@ cv::Mat posterize(int rw, int cl, VXu z, MXf p);
 cv::Mat boundaries(cv::Mat frame, VXu z);
 
 int main(int argc, char** argv){
+
+	using namespace std;
+	using namespace dplv;
+	using namespace cv;
+
 	// Set up the program options.
   	po::options_description desc("Option Flags");
   	desc.add_options()

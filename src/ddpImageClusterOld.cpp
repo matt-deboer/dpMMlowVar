@@ -5,7 +5,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <string>
+#include <std::string>
 #include <vector>
 #include <algorithm>
 #include <Eigen/Dense>
@@ -24,14 +24,15 @@ typedef Eigen::MatrixXi MXi;
 typedef Eigen::Vector3f V3f;
 typedef Eigen::Vector3i V3i;
 
-using namespace std;
-using namespace cv;
-using namespace dplv;
 namespace po = boost::program_options;
+
+// using namespace std;
+// using namespace cv;
+using namespace dplv;
 
 class DMeansPaletteEncoder{
 	public:
-		DMeansPaletteEncoder(string fldrnm){
+		DMeansPaletteEncoder(std::string fldrnm){
 			paletteDiffsOut.open( (fldrnm + "/framediffs.log").c_str(), ios_base::out | ios_base::trunc);
 			paletteOut.open( (fldrnm + "/palette.log").c_str(), ios_base::out | ios_base::trunc);
 			this->fldrnm = fldrnm;
@@ -39,14 +40,14 @@ class DMeansPaletteEncoder{
 			doneFirst = false;
 		}
 		bool doneFirst;
-		string fldrnm;
+		std::string fldrnm;
 		int fr;
 		ofstream paletteDiffsOut, paletteOut;
 		MXu prevPaletteIds;
 		map<int, vector<V3f> > paletteToColorSeq;
 		map<int, int > paletteToFrameStart;
 
-		void outputResiduals(Mat& frame, const VXu& z, const MXf& p){
+		void outputResidualscv::Mat& frame, const VXu& z, const MXf& p){
 			int rw = frame.rows;
 			int cl = frame.cols;
 			vector<int> compression_params;
@@ -55,14 +56,14 @@ class DMeansPaletteEncoder{
 
 			//now compute the residual image and output
 			//change the true frame to RGB
-			Mat tru(rw, cl, CV_8UC3);
-			Mat truF(rw, cl, CV_8UC3);
+			cv::Mat tru(rw, cl, CV_8UC3);
+		cv::Mat truF(rw, cl, CV_8UC3);
 			cvtColor(frame, truF, CV_Lab2RGB);
 			truF.convertTo(tru, CV_8U, 255.0);
 			//change the posterized frame to RGB
-			Mat postLab(rw, cl, CV_32FC3);
-			Mat postF(rw, cl, CV_32FC3);
-			Mat post(rw, cl, CV_8UC3);
+		cv::Mat postLab(rw, cl, CV_32FC3);
+		cv::Mat postF(rw, cl, CV_32FC3);
+		cv::Mat post(rw, cl, CV_8UC3);
 			int idx = 0;
 			for(int y = 0; y < rw; y++){
 				for (int x = 0; x < cl; x++){
@@ -76,7 +77,7 @@ class DMeansPaletteEncoder{
 			cvtColor(postLab, postF, CV_Lab2RGB);
 			postF.convertTo(post, CV_8U, 255.0);
 			//get the residual image
-			Mat res(rw, cl, CV_8UC3);
+		cv::Mat res(rw, cl, CV_8UC3);
 			for(int i = 0; i < rw; i++){
 				for (int j = 0; j < cl; j++){
 					Vec3f& clr = res.at<Vec3f>(i, j);
@@ -87,7 +88,7 @@ class DMeansPaletteEncoder{
 					tmp = 127 +clrt.val[2] - clrp.val[2]; clr.val[2] = tmp;
 				}
 			}
-			ostringstream oss;
+			std::ostringstream oss;
 			oss << fldrnm << "/res-" << setw(7) << setfill('0') << fr << ".png";
 			imwrite(oss.str(), res, compression_params);
 		}
@@ -95,9 +96,9 @@ class DMeansPaletteEncoder{
 			vector<int> compression_params;
 			compression_params.push_back(CV_IMWRITE_PNG_COMPRESSION);
 			compression_params.push_back(9); //9 means maximum compression/slowest
-			Mat frameLabOut(rw, cl, CV_32FC3);
-			Mat frameOutF(rw, cl, CV_32FC3);
-			Mat frameOut(rw, cl, CV_8UC3);
+		cv::Mat frameLabOut(rw, cl, CV_32FC3);
+		cv::Mat frameOutF(rw, cl, CV_32FC3);
+		cv::Mat frameOut(rw, cl, CV_8UC3);
 			int idx = 0;
 			for(int y = 0; y < rw; y++){
 				for (int x = 0; x < cl; x++){
@@ -110,13 +111,13 @@ class DMeansPaletteEncoder{
 			}
 			cvtColor(frameLabOut, frameOutF, CV_Lab2RGB);
 			frameOutF.convertTo(frameOut, CV_8U, 255.0);
-			//Mat medianFrame;
+			/cv::Mat medianFrame;
 			//medianBlur(frameOut, medianFrame, 3);
-			ostringstream oss;
+			std::ostringstream oss;
 			oss << fldrnm << "/post-" << setw(7) << setfill('0') << fr << ".png";
 			imwrite(oss.str(), frameOut, compression_params);
 		}
-		void addFrame(Mat& nextFrame, const VXu& z, const MXf& p){
+		void addFramecv::Mat& nextFrame, const VXu& z, const MXf& p){
 			int rw = nextFrame.rows;
 			int cl = nextFrame.cols;
 			if (doneFirst){
@@ -248,7 +249,7 @@ int makeDirectory(const char* name){
 	return 0;
 }
 
-void printProgress(string pre, double pct){
+void printProgress(std::string pre, double pct){
 	cout << pre << ": [";
 	int nEq = pct*50;
 	for (int i = 0; i < nEq; i++){
@@ -265,8 +266,8 @@ void printProgress(string pre, double pct){
 	return;
 }
 
-shared_ptr<MXf> extractVectorData(Mat& frame){
-	Mat framef, frameLab;
+shared_ptr<MXf> extractVectorDatacv::Mat& frame){
+cv::Mat framef, frameLab;
 	frame.convertTo(framef, CV_32F, 1.0/255.0);
 	cvtColor(framef, frameLab, CV_RGB2Lab);
 	MXf* data = new MXf(3, frame.rows*frame.cols);
@@ -291,8 +292,8 @@ int main(int argc, char** argv){
   	po::options_description desc("Option Flags");
   	desc.add_options()
   	  ("help,h", "produce help message")
-  	  ("video_name,v", po::value<string>()->required(), "The name of the video")
-  	  ("frame_folder_name,f", po::value<string>()->default_value("frames"), "The folder to store frames in")
+  	  ("video_name,v", po::value<std::string>()->required(), "The name of the video")
+  	  ("frame_folder_name,f", po::value<std::string>()->default_value("frames"), "The folder to store frames in")
   	  ("resize_factor,r", po::value<double>()->default_value(1.0), "The factor to resize the video by")
 	  ("residual_bits,b", po::value<int>()->default_value(0), "The number of residual bits to store")
 	  ("spline_error,e", po::value<double>()->default_value(1.0), "Allowable error on the color dictionary spline")
@@ -312,7 +313,7 @@ int main(int argc, char** argv){
 	}
 	
 	//create the capture object for the video
-	string vidname = vm["video_name"].as<string>();
+	std::string vidname = vm["video_name"].as<std::string>();
 	VideoCapture cap(vidname);
 	if(!cap.isOpened()){
 		cout << "Couldn't open " << vidname << " for reading" << endl;
@@ -320,7 +321,7 @@ int main(int argc, char** argv){
 	} 
 
 	//make the directory for storing frames if it doesn't already exist
-	if(makeDirectory(vm["frame_folder_name"].as<string>().c_str()) == -1){return -1;}
+	if(makeDirectory(vm["frame_folder_name"].as<std::string>().c_str()) == -1){return -1;}
 
 	int n_fr = cap.get(CV_CAP_PROP_FRAME_COUNT);
 	int fps = cap.get(CV_CAP_PROP_FPS);
@@ -330,7 +331,7 @@ int main(int argc, char** argv){
 	cout << "Frame Dimensions: " << fr_w << " x " << fr_h << endl;
 	cout << "Framerate: " << fps << endl;
 	cout << "# Frames: " << n_fr << endl;
-	cout << "Frame Storage Directory: " << vm["frame_folder_name"].as<string>() << endl;
+	cout << "Frame Storage Directory: " << vm["frame_folder_name"].as<std::string>() << endl;
 
 	//compression params for PNG frame image writing
 	vector<int> compression_params;
@@ -357,18 +358,18 @@ int main(int argc, char** argv){
     	DDPMeansCUDA<float,Euclidean<float> >(cld, lambda, Q, tau);
 
 	//set up the palette encoder
-	DMeansPaletteEncoder dmpe(vm["frame_folder_name"].as<string>());
+	DMeansPaletteEncoder dmpe(vm["frame_folder_name"].as<std::string>());
 
 	//loop over frames, resize if necessary, and cluster
 	int fr = 1;
 	for(;;){
-		printProgress(string("Processing ") + vidname, ((double)fr)/n_fr);
-		Mat frame;
+		printProgress(std::string("Processing ") + vidname, ((double)fr)/n_fr);
+	cv::Mat frame;
 		cap.grab();
 		bool empty = !cap.retrieve(frame);
 		if(empty) break;
 		if (nfr_w != fr_w || nfr_h != fr_h){
-			Mat frameresized;
+		cv::Mat frameresized;
 			resize(frame, frameresized, Size(nfr_w, nfr_h), 0, 0, INTER_CUBIC);
 			frameresized.copyTo(frame);
 		}
